@@ -2,6 +2,7 @@ FROM node:alpine
 
 WORKDIR /app
 
+# Copy all project files, including assets
 COPY . .
 
 RUN npm install

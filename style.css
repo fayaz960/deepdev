@@ -5,53 +5,9 @@ body {
     font-family: Arial, sans-serif;
 }
 
-#gameCanvas {
-    display: none;
+canvas {
+    display: block;
 }
 
-#welcome-screen {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    text-align: center;
-    background-color: #70c5ce;
-    color: white;
-}
-
-#face-img {
-    width: 150px;
-    border-radius: 50%;
-    margin-top: 10px;
-}
-
-#play-button {
-    padding: 10px 20px;
-    font-size: 18px;
-    background-color: #ffcc00;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-#play-button:hover {
-    background-color: #ff9900;
-}
-
-#greeting span {
-    color: #ffcc00;
-    animation: bounce 1s infinite;
-}
-
-/* Flappy Bird jump animation */
-@keyframes bounce {
-    0%, 100% {
-        transform: translateY(0);
-    }
-    50% {
-        transform: translateY(-10px);
-    }
-}
+/* Styling for a clean 3D-like experience will be handled in JS using images */
 

@@ -9,11 +9,11 @@ pipeline {
         stage('Cleanup') {
             steps {
                 sh '''
-                # Stop and remove any running container named "webapp"
+                # Stop and remove any running containers named "webapp"
                 docker stop webapp || true
                 docker rm webapp || true
 
-                # Remove previous Docker image if it exists
+                # Remove the previous Docker image if it exists
                 docker rmi $DOCKER_IMAGE || true
 
                 # Clean up any dangling Docker resources
@@ -31,7 +31,7 @@ pipeline {
 
         stage('Test') {
             steps {
-                // Simple placeholder for tests (replace this with real tests later)
+                // Simple placeholder for tests (replace with real tests if needed)
                 sh 'echo "Running tests... Simulated server test passed."'
             }
         }
