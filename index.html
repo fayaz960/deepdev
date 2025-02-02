@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flappy Bird - DevOps Web App</title>
+    <title>Flappy Adventure - Custom Game</title>
     <style>
         body {
             margin: 0;
@@ -25,20 +25,21 @@
         canvas.height = window.innerHeight;
 
         // Images
-        const birdImg = new Image();
-        birdImg.src = "https://i.imgur.com/95XLVKd.png";
+        const characterImg = new Image();
+        characterImg.src = "https://i.imgur.com/XYX2Wl7.png";  // Custom character (Change this to your desired image)
 
-        // Bird properties
-        let bird = { x: 50, y: canvas.height / 2, size: 30, gravity: 0.5, velocity: 0 };
+        const tntImg = new Image();
+        tntImg.src = "https://i.imgur.com/5PMMGyy.png";  // TNT explosion (Change this if needed)
 
-        // Pipe properties
+        // Game variables
+        let character = { x: 50, y: canvas.height / 2, size: 50, gravity: 0.5, velocity: 0 };
         let pipes = [];
-        let pipeGap = 150;
+        let pipeGap = 170;
         let pipeWidth = 60;
         let frame = 0;
-
-        // Game state
+        let points = 0;
         let isGameOver = false;
+        let explosion = { active: false, x: 0, y: 0 };
 
         function spawnPipe() {
             const pipeHeight = Math.random() * (canvas.height / 2) + 50;
@@ -46,15 +47,17 @@
         }
 
         function resetGame() {
-            bird.y = canvas.height / 2;
-            bird.velocity = 0;
+            character.y = canvas.height / 2;
+            character.velocity = 0;
             pipes = [];
             frame = 0;
+            points = 0;
             isGameOver = false;
+            explosion.active = false;
         }
 
-        function drawBird() {
-            context.drawImage(birdImg, bird.x, bird.y, bird.size, bird.size);
+        function drawCharacter() {
+            context.drawImage(characterImg, character.x, character.y, character.size, character.size);
         }
 
         function drawPipes() {
@@ -70,43 +73,78 @@
         function updatePipes() {
             pipes.forEach(pipe => {
                 pipe.x -= 5;
+
+                // Increase points when passing a pipe
+                if (pipe.x + pipeWidth === character.x) {
+                    points += 1;
+                }
+
                 // Collision detection
                 if (
-                    (bird.x + bird.size > pipe.x && bird.x < pipe.x + pipeWidth) &&
-                    (bird.y < pipe.y || bird.y + bird.size > pipe.y + pipeGap)
+                    (character.x + character.size > pipe.x && character.x < pipe.x + pipeWidth) &&
+                    (character.y < pipe.y || character.y + character.size > pipe.y + pipeGap)
                 ) {
+                    triggerExplosion(character.x, character.y);
                     isGameOver = true;
                 }
             });
+
             // Remove off-screen pipes
             pipes = pipes.filter(pipe => pipe.x + pipeWidth > 0);
+
             if (frame % 90 === 0) spawnPipe();  // Spawn pipes periodically
         }
 
-        function updateBird() {
-            bird.velocity += bird.gravity;
-            bird.y += bird.velocity;
-            if (bird.y + bird.size > canvas.height || bird.y < 0) {
+        function triggerExplosion(x, y) {
+            explosion.active = true;
+            explosion.x = x;
+            explosion.y = y;
+        }
+
+        function drawExplosion() {
+            if (explosion.active) {
+                context.drawImage(tntImg, explosion.x, explosion.y, 100, 100);
+            }
+        }
+
+        function updateCharacter() {
+            character.velocity += character.gravity;
+            character.y += character.velocity;
+
+            if (character.y + character.size > canvas.height || character.y < 0) {
+                triggerExplosion(character.x, character.y);
                 isGameOver = true;
             }
         }
 
+        function drawScore() {
+            context.fillStyle = "black";
+            context.font = "30px Arial";
+            context.fillText(`Score: ${points}`, 20, 40);
+        }
+
+        function drawGameOver() {
+            context.fillStyle = "black";
+            context.font = "50px Arial";
+            context.fillText("Game Over!", canvas.width / 2 - 130, canvas.height / 2);
+            context.font = "20px Arial";
+            context.fillText("Press Space to Restart", canvas.width / 2 - 120, canvas.height / 2 + 40);
+        }
+
         function draw() {
             context.clearRect(0, 0, canvas.width, canvas.height);
-            drawBird();
+            drawCharacter();
             drawPipes();
+            drawScore();
+            drawExplosion();
             if (isGameOver) {
-                context.fillStyle = "black";
-                context.font = "50px Arial";
-                context.fillText("Game Over!", canvas.width / 2 - 130, canvas.height / 2);
-                context.font = "20px Arial";
-                context.fillText("Press Space to Restart", canvas.width / 2 - 120, canvas.height / 2 + 40);
+                drawGameOver();
             }
         }
 
         function update() {
             if (!isGameOver) {
-                updateBird();
+                updateCharacter();
                 updatePipes();
             }
         }
@@ -124,7 +162,7 @@
                 if (isGameOver) {
                     resetGame();
                 } else {
-                    bird.velocity = -8;  // Bird jumps
+                    character.velocity = -8;  // Character jumps
                 }
             }
         });
