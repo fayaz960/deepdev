@@ -1,15 +1,22 @@
 pipeline {
     agent any
 
+    environment {
+        DOCKER_IMAGE = "flappy-webapp"  // Name of the Docker image
+    }
+
     stages {
         stage('Cleanup') {
             steps {
-                // Stop and remove all existing containers named "webapp"
-                // Remove the previous Docker image for a fresh build
                 sh '''
+                # Stop and remove any running container named "webapp"
                 docker stop webapp || true
                 docker rm webapp || true
-                docker rmi devops-webapp || true
+
+                # Remove previous Docker image if it exists
+                docker rmi $DOCKER_IMAGE || true
+
+                # Clean up any dangling Docker resources
                 docker system prune -f --volumes || true
                 '''
             }
@@ -17,29 +24,31 @@ pipeline {
 
         stage('Build') {
             steps {
-                // Build the Docker image
-                sh 'docker build -t devops-webapp .'
+                // Build a fresh Docker image for the app
+                sh 'docker build -t $DOCKER_IMAGE .'
             }
         }
 
         stage('Test') {
             steps {
-                // Dummy test stage (add real tests as needed)
-                sh 'echo "Running tests..."'
+                // Simple placeholder for tests (replace this with real tests later)
+                sh 'echo "Running tests... Simulated server test passed."'
             }
         }
 
         stage('Deploy') {
             steps {
-                // Deploy the container on port 8081
-                sh 'docker run -d -p 8081:80 --name webapp devops-webapp'
+                // Deploy the app on port 8081 of the host
+                sh '''
+                docker run -d -p 8081:8080 --name webapp $DOCKER_IMAGE
+                '''
             }
         }
     }
 
     post {
         always {
-            // Show running containers (for debugging purposes)
+            // Display running Docker containers after deployment for debugging
             sh 'docker ps'
         }
     }

@@ -3,172 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flappy Adventure - Custom Game</title>
-    <style>
-        body {
-            margin: 0;
-            overflow: hidden;
-            background-color: #70c5ce;
-        }
-        canvas {
-            display: block;
-        }
-    </style>
+    <title>Flappy Adventure WebApp</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <script>
-        const canvas = document.createElement('canvas');
-        const context = canvas.getContext('2d');
-        document.body.appendChild(canvas);
+    <!-- Welcome Screen -->
+    <div id="welcome-screen">
+        <h1 id="greeting">Hi, <span>fayaz960</span>!</h1>
+        <img src="https://i.imgur.com/OCVKJyl.png" alt="Your Face" id="face-img">
+        <p>Get ready for an exciting adventure!</p>
+        <button id="play-button">Play Game</button>
+    </div>
 
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+    <!-- Game Canvas -->
+    <canvas id="gameCanvas"></canvas>
 
-        // Images
-        const characterImg = new Image();
-        characterImg.src = "https://i.imgur.com/XYX2Wl7.png";  // Custom character (Change this to your desired image)
-
-        const tntImg = new Image();
-        tntImg.src = "https://i.imgur.com/5PMMGyy.png";  // TNT explosion (Change this if needed)
-
-        // Game variables
-        let character = { x: 50, y: canvas.height / 2, size: 50, gravity: 0.5, velocity: 0 };
-        let pipes = [];
-        let pipeGap = 170;
-        let pipeWidth = 60;
-        let frame = 0;
-        let points = 0;
-        let isGameOver = false;
-        let explosion = { active: false, x: 0, y: 0 };
-
-        function spawnPipe() {
-            const pipeHeight = Math.random() * (canvas.height / 2) + 50;
-            pipes.push({ x: canvas.width, y: pipeHeight });
-        }
-
-        function resetGame() {
-            character.y = canvas.height / 2;
-            character.velocity = 0;
-            pipes = [];
-            frame = 0;
-            points = 0;
-            isGameOver = false;
-            explosion.active = false;
-        }
-
-        function drawCharacter() {
-            context.drawImage(characterImg, character.x, character.y, character.size, character.size);
-        }
-
-        function drawPipes() {
-            context.fillStyle = "#5DA130";
-            pipes.forEach(pipe => {
-                // Top pipe
-                context.fillRect(pipe.x, 0, pipeWidth, pipe.y);
-                // Bottom pipe
-                context.fillRect(pipe.x, pipe.y + pipeGap, pipeWidth, canvas.height - pipe.y - pipeGap);
-            });
-        }
-
-        function updatePipes() {
-            pipes.forEach(pipe => {
-                pipe.x -= 5;
-
-                // Increase points when passing a pipe
-                if (pipe.x + pipeWidth === character.x) {
-                    points += 1;
-                }
-
-                // Collision detection
-                if (
-                    (character.x + character.size > pipe.x && character.x < pipe.x + pipeWidth) &&
-                    (character.y < pipe.y || character.y + character.size > pipe.y + pipeGap)
-                ) {
-                    triggerExplosion(character.x, character.y);
-                    isGameOver = true;
-                }
-            });
-
-            // Remove off-screen pipes
-            pipes = pipes.filter(pipe => pipe.x + pipeWidth > 0);
-
-            if (frame % 90 === 0) spawnPipe();  // Spawn pipes periodically
-        }
-
-        function triggerExplosion(x, y) {
-            explosion.active = true;
-            explosion.x = x;
-            explosion.y = y;
-        }
-
-        function drawExplosion() {
-            if (explosion.active) {
-                context.drawImage(tntImg, explosion.x, explosion.y, 100, 100);
-            }
-        }
-
-        function updateCharacter() {
-            character.velocity += character.gravity;
-            character.y += character.velocity;
-
-            if (character.y + character.size > canvas.height || character.y < 0) {
-                triggerExplosion(character.x, character.y);
-                isGameOver = true;
-            }
-        }
-
-        function drawScore() {
-            context.fillStyle = "black";
-            context.font = "30px Arial";
-            context.fillText(`Score: ${points}`, 20, 40);
-        }
-
-        function drawGameOver() {
-            context.fillStyle = "black";
-            context.font = "50px Arial";
-            context.fillText("Game Over!", canvas.width / 2 - 130, canvas.height / 2);
-            context.font = "20px Arial";
-            context.fillText("Press Space to Restart", canvas.width / 2 - 120, canvas.height / 2 + 40);
-        }
-
-        function draw() {
-            context.clearRect(0, 0, canvas.width, canvas.height);
-            drawCharacter();
-            drawPipes();
-            drawScore();
-            drawExplosion();
-            if (isGameOver) {
-                drawGameOver();
-            }
-        }
-
-        function update() {
-            if (!isGameOver) {
-                updateCharacter();
-                updatePipes();
-            }
-        }
-
-        function gameLoop() {
-            update();
-            draw();
-            frame++;
-            requestAnimationFrame(gameLoop);
-        }
-
-        // Controls
-        document.addEventListener('keydown', (event) => {
-            if (event.code === "Space") {
-                if (isGameOver) {
-                    resetGame();
-                } else {
-                    character.velocity = -8;  // Character jumps
-                }
-            }
-        });
-
-        gameLoop();
-    </script>
+    <script src="game.js"></script>
 </body>
 </html>
 
